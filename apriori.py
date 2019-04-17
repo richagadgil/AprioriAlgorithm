@@ -1,11 +1,11 @@
 
 import sys
 import re
+import csv
 
-def apriori():
+def apriori(filename, itemset, minsup, minconf):
     pass
    
-
 
 def main():
     # This command-line parsing code is provided.
@@ -30,8 +30,19 @@ def main():
     filename = args[0]
     minsup = float(args[1])
     minconf = float(args[2])
+    itemset = get_itemset(filename)
+    apriori(filename, itemset, minsup, minconf)
     
+def get_itemset(filename):
+    itemset = []
+    with open(filename) as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            for value in row:
+                if(value not in itemset):
+                    itemset.append(value)
 
+    return itemset
 
 if __name__ == '__main__':
   main()
