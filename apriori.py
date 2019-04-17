@@ -31,38 +31,23 @@ def apriori(filename, itemset, minsup, minconf):
         node.add_data(i)
         C[k].append(node)
 
-    #compute_support(C, 1, filename)
-    #extend_prefix_tree(C, 1, itemset)
+    compute_support(C, 1, filename)
+    extend_prefix_tree(C, 1, itemset)
 
-    #return 
-    a = 0 
-    b = 0
-    i = 0
-    c = 0
-    print(len(C[k]))
+    return 
+ 
 
-    while(len(C[k]) != 0 and i < 1):
+    while(len(C[k]) != 0):
         compute_support(C, k, filename)
-        print(k, 'computed')
-        print(len(C[k]))
         for leaf in C[k]:
-            c += 1
             if(float(leaf.support)/43367 > minsup):
-                a += 1
                 F.append((leaf.data, leaf.support))
             else:
-                b += 1
                 C[k].remove(leaf)
-        print(len(C[k]))
         returned = extend_prefix_tree(C, k, itemset)
-        print(k, 'new tree')
         k = k + 1
         C.append(returned)
-        i+=1
 
-    print(a, "\n")
-    print(b, "\n", c)
-    
     return F
 
 def extend_prefix_tree(C, k, itemset):
@@ -74,8 +59,6 @@ def extend_prefix_tree(C, k, itemset):
             
     returned = []
 
-    #first implementation -- start from order in itemset
-    #just check for duplicates 
 
     for leafA in range(0, len(C[k])):
         last_key = (C[k][leafA]).data[-1]
@@ -106,12 +89,7 @@ def compute_support(C, k, filename):
         reader = csv.reader(csvfile)
         for row in reader:
             for item in items:
-                #if(k == 2):
-                    #print(item.data)
-                    #print(row)
                 if(set(item.data).issubset(set(row))): 
-                    #if(k == 2):
-                        #print('done')
                     item.add_support()
             
  
