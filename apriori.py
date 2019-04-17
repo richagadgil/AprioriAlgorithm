@@ -31,31 +31,34 @@ def apriori(filename, itemset, minsup, minconf):
         node.add_data(i)
         C[k].append(node)
 
-    compute_support(C, 1, filename)
-    extend_prefix_tree(C, 1, itemset)
+   # compute_support(C, 1, filename)
+   # extend_prefix_tree(C, 1, itemset)
 
-    return 
+   # return 
+    i = 0
  
-
     while(len(C[k]) != 0):
+        i += 1
         compute_support(C, k, filename)
-        for leaf in C[k]:
+        for leaf in list(C[k]):
             if(float(leaf.support)/43367 > minsup):
                 F.append((leaf.data, leaf.support))
             else:
                 C[k].remove(leaf)
         returned = extend_prefix_tree(C, k, itemset)
+        print(returned[0:5])
         k = k + 1
         C.append(returned)
 
+    print(F)
     return F
 
 def extend_prefix_tree(C, k, itemset):
 
-    next_leaf_set = []
+    new_leaf_set = []
     if(k-1 > 0):
         for node in C[k-1]:
-            next_leaf_set.append(node.data)
+            new_leaf_set.append(node.data)
             
     returned = []
 
@@ -72,7 +75,7 @@ def extend_prefix_tree(C, k, itemset):
                 for previous_list in new_leaf_set:
                     if(set(previous_list).issubset(set(new_data))): 
                         returned.append(new_node)
-                        print(new_data)
+                        #print(new_data)
             else:
                 returned.append(new_node)
                 #print(new_data)
@@ -130,8 +133,9 @@ def get_itemset(filename):
         reader = csv.reader(csvfile)
         for row in reader:
             for value in row:
-                i += 1
-                if(value not in itemset):
+                if(value != ""):
+                    i += 1
+                if(value not in itemset and value != ""):
                     itemset.append(value)
     print(i)
     return itemset
