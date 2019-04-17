@@ -3,8 +3,98 @@ import sys
 import re
 import csv
 
+class Node:
+
+    data = []
+    support = 0
+
+    def __init__(self):
+        self.data= []
+        self.support = 0
+    
+    def add_data(self, data):
+        self.data.append(data)
+    
+    def add_support(self):
+        self.support += 1
+
 def apriori(filename, itemset, minsup, minconf):
-    pass
+    F = []
+
+    C = []
+    C.append([0])
+    C.append([])
+    k = 1
+
+    for i in itemset:
+        node = Node()
+        node.add_data(i)
+        C[k].append(node)
+
+    compute_support(C, 1, filename)
+    extend_prefix_tree(C, 1, itemset)
+
+    return 
+ 
+
+    while(len(C[k]) != 0):
+        compute_support(C, k, filename)
+        for leaf in C[k]:
+            if(float(leaf.support)/43367 > minsup):
+                F.append((leaf.data, leaf.support))
+            else:
+                C[k].remove(leaf)
+        returned = extend_prefix_tree(C, k, itemset)
+        k = k + 1
+        C.append(returned)
+
+    return F
+
+def extend_prefix_tree(C, k, itemset):
+
+    next_leaf_set = []
+    if(k-1 > 0):
+        for node in C[k-1]:
+            next_leaf_set.append(node.data)
+            
+    returned = []
+
+
+    for leafA in range(0, len(C[k])):
+        last_key = (C[k][leafA]).data[-1]
+        start_range = itemset.index(last_key)
+        for leafB in range(start_range+1, len(itemset)):
+            new_node = Node()
+            new_data = (C[k][leafA]).data + [itemset[leafB]]
+            new_node.data = new_data
+
+            if(k - 1 > 0):
+                for previous_list in new_leaf_set:
+                    if(set(previous_list).issubset(set(new_data))): 
+                        returned.append(new_node)
+                        print(new_data)
+            else:
+                returned.append(new_node)
+                #print(new_data)
+    return returned
+
+
+
+def compute_support(C, k, filename):
+
+    items = C[k]
+    i = 0
+
+    with open(filename) as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            for item in items:
+                if(set(item.data).issubset(set(row))): 
+                    item.add_support()
+            
+ 
+
+
    
 
 def main():
@@ -34,14 +124,16 @@ def main():
     apriori(filename, itemset, minsup, minconf)
     
 def get_itemset(filename):
+    i = 0
     itemset = []
     with open(filename) as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             for value in row:
+                i += 1
                 if(value not in itemset):
                     itemset.append(value)
-
+    print(i)
     return itemset
 
 if __name__ == '__main__':
