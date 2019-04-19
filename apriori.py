@@ -52,7 +52,8 @@ def apriori(results, itemset, minsup, minconf):
         i += 1
         compute_support(C, k, results)
         for leaf in list(C[k]):
-            if(float(leaf.support)/len(results) > minsup):
+            if(float(leaf.support)/len(results) >= minsup):
+
                 F.append((leaf.data, leaf.support))
             else:
                 C[k].remove(leaf)
@@ -185,6 +186,8 @@ def generate_rules(F, minconf, results):
             i += 1
             A = getpowerset(Z)
 
+
+
             while len(A) != 0:
                 i+=1
                 X = []
@@ -195,14 +198,10 @@ def generate_rules(F, minconf, results):
                     if(supp > max_supp):
                         max_supp = supp
                         X = each_set
-                #print('MAX', X, max_supp)
-                #print(A, X)
-                #A.remove(X)
-                #A = [x for x in A if x not in X]
-                #print(A)
-                #print(A, X)
+           
+
                 A.remove(X)
-                #print(A)
+
                 c = float(Z[1]) / max_supp
                 if(c >= minconf):
                     z_minus = [x for x in Z[0] if (x not in X)]
@@ -236,11 +235,12 @@ def getpowerset(Z):
     s = list(itemset)
     power = list(chain.from_iterable(combinations(s, r) for r in range(len(s)+1)))
 
-    power[:] = [x for x in power if (x != () and x not in itemset)]
+   # power[:] = [x for x in power if (x != () and x not in itemset)]
 
     power = [list(element) for element in power]
 
     power.remove(itemset)
+
 
     return power
 
