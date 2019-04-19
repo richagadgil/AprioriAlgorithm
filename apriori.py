@@ -3,6 +3,7 @@ import sys
 import re
 import csv
 import pandas as pd
+from itertools import chain, combinations
 
 class Node:
 
@@ -61,7 +62,7 @@ def apriori(results, itemset, minsup, minconf):
         k = k + 1
         C.append(returned)
 
-    print(len(F))
+    #print(len(F))
     return F
 
 def extend_prefix_tree(C, k, itemset):
@@ -144,7 +145,9 @@ def main():
 
     itemset = get_itemset(results)
 
-    apriori(results, itemset, minsup, minconf)
+    F = apriori(results, itemset, minsup, minconf)
+
+    generate_rules(F, minconf, results)
     
 def get_itemset(results):
     i = 0
@@ -154,31 +157,92 @@ def get_itemset(results):
 
     return itemset
 
-def generate_rules(freqitems, minconf, results):
-    for itemset in freqitems:
-        # generate powerset..
-        powerset = getpowerset(itemset)
+def generate(F, minconf, results):
 
-        totsupport = itemset.support
-        powersetlen = len(powerset)
-        iterator = 0
-        while powersetlen != 0:
-            if powerset[iterator]:
-                sup = rule_computesupport(powerset[iterator], results)
-                confidence = totsupport / sup
-                if confidence >= minconf:
-                    checkingset = set(itemset) - set(powerset[iterator])
-                    print(powerset[iterator] + "->" + checkingset)
+    for itemset in F:
+        if len(itemset) >= 2:
+            powerset = []
+            #powerset.append(getpowerset(itemset))
+
+            totsupport = itemset.support
+            powersetlen = len(powerset)
+            iterator = 0
+            while powersetlen != 0:
+                if powerset[iterator]:
+                    sup = rule_computesupport(powerset[iterator], results)
+                    confidence = totsupport / sup
+                    if confidence >= minconf:
+                        checkingset = set(itemset) - set(powerset[iterator])
+                        print(powerset[iterator] + "->" + checkingset)
+                        powerset -= 1
 
 
-def rule_computesupport(subset, results)
+def generate_rules(F, minconf, results):
+    print(F)
+    i = 0
+    for Z in F:
+        if len(Z[0]) >= 2:
+            i += 1
+            A = getpowerset(Z)
+
+            while len(A) != 0:
+                i+=1
+                X = []
+                max_supp = 0
+                for each_set in A:
+                    supp = rule_computesupport(each_set, results)
+
+                    if(supp > max_supp):
+                        max_supp = supp
+                        X = each_set
+                #print('MAX', X, max_supp)
+                #print(A, X)
+                #A.remove(X)
+                #A = [x for x in A if x not in X]
+                #print(A)
+                #print(A, X)
+                A.remove(X)
+                #print(A)
+                c = float(Z[1]) / max_supp
+                if(c >= minconf):
+                    z_minus = [x for x in Z[0] if (x not in X)]
+                    print(X, '->', z_minus, Z[1], c)
+                else:
+                   A = [x for x in A if set(x).issubset(set(X)) == False]
+                
+
+
+
+            
+
+
+def rule_computesupport(subset, results):
+    support = 0
+
+
     for row in results:
-        if(set(subset.data).issubset(set(row))): 
-            subset.add_support()
+        if(set(subset).issubset(set(row))): 
+            support+=1
+    
+    return support
 
-def getpowerset(itemset):
-    s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+def getpowerset(Z):
+
+
+    itemset = []
+    for i in Z[0]:
+        itemset.append(i)
+
+    s = list(itemset)
+    power = list(chain.from_iterable(combinations(s, r) for r in range(len(s)+1)))
+
+    power[:] = [x for x in power if (x != () and x not in itemset)]
+
+    power = [list(element) for element in power]
+
+    power.remove(itemset)
+
+    return power
 
 
 
