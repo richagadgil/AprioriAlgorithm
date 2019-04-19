@@ -43,6 +43,7 @@ def apriori(results, itemset, minsup, minconf):
         node.add_parent(C[k-1][0])
         C[k].append(node)
         C[k-1][0].add_children(node)
+    
 
     i = 0
  
@@ -50,48 +51,20 @@ def apriori(results, itemset, minsup, minconf):
         i += 1
         compute_support(C, k, results)
         for leaf in list(C[k]):
-            if(float(leaf.support)/len(results) > minsup):
+            if(float(leaf.support)/len(results) >= minsup):
                 F.append((leaf.data, leaf.support))
             else:
                 C[k].remove(leaf)
-        if(len(C[k]) != 0):
-            returned = extend_prefix_tree(C, k, itemset)
-            #print(returned[0:5])
-            k = k + 1
-            C.append(returned)
-        print('LENGTH', len(C[k]))
+        
 
+        returned = extend_prefix_tree(C, k, itemset)
+        k = k + 1
+        C.append(returned)
 
     print(F)
     return F
 
 def extend_prefix_tree(C, k, itemset):
-
-    #new_leaf_set = []
-    #2if(k-1 > 0):
-     #   for node in C[k-1]:
-     #       new_leaf_set.append(node.data)
-            
-    #returned = []
-
-
-    #for leafA in range(0, len(C[k])):
-    #    last_key = (C[k][leafA]).data[-1]
-    #    start_range = itemset.index(last_key)
-    #    for leafB in range(start_range+1, len(itemset)):
-    #        new_node = Node()
-    #        new_data = (C[k][leafA]).data + [itemset[leafB]]
-    ##        new_node.data = new_data
-
-    #        if(k - 1 > 0):
-    #            for previous_list in new_leaf_set:
-    #                if(set(previous_list).issubset(set(new_data))): 
-    ##                    returned.append(new_node)
-    #                    #print(new_data)
-    #        else:
-    #            returned.append(new_node)
-    #            #print(new_data)
-    #return returned
 
     returned = []
     duplicates = []
@@ -100,35 +73,27 @@ def extend_prefix_tree(C, k, itemset):
         for i in leaf.data:
             prev_list.append(i)
 
-    C_copy = C[k].copy()
-
-    for leafA in range(0, len(C[k])):
-        siblings = [x for x in C[k] if (x.parent == C[k][leafA].parent and C[k].index(x) > leafA)]
+    for leafA in range(len(C[k])-1, 0, -1):
+        siblings = [x for x in C[k] if (x.parent == C[k][leafA].parent and C[k].index(x) < leafA)]
         extensions = False
+
         for leafB in siblings:
             new_node = Node()
             new_data = list(set(C[k][leafA].data + leafB.data))
             new_node.data = new_data
             new_node.add_parent(C[k][leafA])
 
-            
-            
-            #print(prev_list)
             if(set(new_data).issubset(set(prev_list))):
                 returned.append(new_node)
                 C[k][leafA].add_children(new_node)
                 extensions = True
 
-                #print(new_data)
 
 
-        #if(extensions == False):
-        #    print('fel')
-        #    del C[k][leafA]
-        #if(extensions == False):
-        #    print('hi')
+        if(extensions == False):
+            del C[k][leafA]
+
     
-
 
     return returned
 
@@ -174,9 +139,11 @@ def main():
         for line in f:
             words = line.split(',')
             filtered = [word.strip() for word in words]
+            filtered[:] = [x for x in filtered if x != '']
             results.append(filtered)
 
     itemset = get_itemset(results)
+
     apriori(results, itemset, minsup, minconf)
     
 def get_itemset(results):
