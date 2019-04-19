@@ -154,6 +154,34 @@ def get_itemset(results):
 
     return itemset
 
+def generate_rules(freqitems, minconf, results):
+    for itemset in freqitems:
+        # generate powerset..
+        powerset = getpowerset(itemset)
+
+        totsupport = itemset.support
+        powersetlen = len(powerset)
+        iterator = 0
+        while powersetlen != 0:
+            if powerset[iterator]:
+                sup = rule_computesupport(powerset[iterator], results)
+                confidence = totsupport / sup
+                if confidence >= minconf:
+                    checkingset = set(itemset) - set(powerset[iterator])
+                    print(powerset[iterator] + "->" + checkingset)
+
+
+def rule_computesupport(subset, results)
+    for row in results:
+        if(set(subset.data).issubset(set(row))): 
+            subset.add_support()
+
+def getpowerset(itemset):
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+
+
 if __name__ == '__main__':
   main()
 
