@@ -51,7 +51,7 @@ def apriori(results, itemset, minsup, minconf):
         i += 1
         compute_support(C, k, results)
         for leaf in list(C[k]):
-            if(float(leaf.support)/len(results) >= minsup):
+            if(float(leaf.support)/len(results) > minsup):
                 F.append((leaf.data, leaf.support))
             else:
                 C[k].remove(leaf)
@@ -61,7 +61,7 @@ def apriori(results, itemset, minsup, minconf):
         k = k + 1
         C.append(returned)
 
-    print(F)
+    print(len(F))
     return F
 
 def extend_prefix_tree(C, k, itemset):
